@@ -38,11 +38,27 @@ describe('Users',()=>{
             status:'inactive'
         }
 
-        request.post(`${ENDPOINTS.USERS_BASE}`)
+        return request.post(`${ENDPOINTS.USERS_BASE}`)
             .set('Authorization',`Bearer ${process.env.TOKEN}`)
             .send(data)
             .then(res=>{
                 expect(res.body).to.deep.include(data);
             })
+    })
+
+    it('PUT /users/:id', ()=>{
+        const data = {
+            email:`Shashikumar-${Math.floor(Math.random()*100000)}@gmail.com`,
+            name:'Shashikumar'
+        }
+
+        return request.put(`${ENDPOINTS.USERS_BASE}/2654`)
+            .set('Authorization',`Bearer ${process.env.TOKEN}`)
+            .send(data)
+            .then(res=>{
+                expect(res.body.name).to.be.equal(data.name);
+                expect(res.body.email).to.be.equal(data.email)
+            })
+
     })
 })
