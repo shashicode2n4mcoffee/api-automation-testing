@@ -8,27 +8,8 @@ require('dotenv').config()
 const request = supertest(ENDPOINTS.BASE_URL)
 
 describe('Users',()=>{
-    it('GET /users', (done)=>{
-        request.get(`${ENDPOINTS.USERS}${process.env.TOKEN}`).end((err,res)=>{
-            expect(res.body).to.not.be.empty;
-            done()
-        })
-    })
 
-    it('GET /users/:id',()=>{
-        return request.get(`${ENDPOINTS.USERS_BASE}/2654?access-token=${process.env.TOKEN}`).then((res)=>{
-            expect(res.body.id).to.be.equal(2654)
-        })
-    })
-
-    it('GET /users with the query params',()=>{
-        return request.get(`${ENDPOINTS.USERS}${process.env.TOKEN}&page=100&per_page=10&gender=female`).then(res=>{
-            expect(res.body).to.be.not.empty;
-            res.body.forEach(element => {
-                expect(element.gender).to.be.equal('female')
-            });
-        })
-    })
+    let userId;
 
     it('POST /users', ()=>{
         const data = {
@@ -43,8 +24,32 @@ describe('Users',()=>{
             .send(data)
             .then(res=>{
                 expect(res.body).to.deep.include(data);
+                userId = res.body.id
             })
     })
+
+    it('GET /users', (done)=>{
+        request.get(`${ENDPOINTS.USERS}${process.env.TOKEN}`).end((err,res)=>{
+            expect(res.body).to.not.be.empty;
+            done()
+        })
+    })
+
+    it('GET /users/:id',()=>{
+        return request.get(`${ENDPOINTS.USERS_BASE}/${userId}?access-token=${process.env.TOKEN}`).then((res)=>{
+            expect(res.body.id).to.be.equal(userId)
+        })
+    })
+
+    it('GET /users with the query params',()=>{
+        return request.get(`${ENDPOINTS.USERS}${process.env.TOKEN}&page=100&per_page=10&gender=female`).then(res=>{
+            expect(res.body).to.be.not.empty;
+            res.body.forEach(element => {
+                expect(element.gender).to.be.equal('female')
+            });
+        })
+    })
+
 
     it('PUT /users/:id', ()=>{
         const data = {
@@ -52,7 +57,7 @@ describe('Users',()=>{
             name:'Shashikumar'
         }
 
-        return request.put(`${ENDPOINTS.USERS_BASE}/2654`)
+        return request.put(`${ENDPOINTS.USERS_BASE}/${userId}`)
             .set('Authorization',`Bearer ${process.env.TOKEN}`)
             .send(data)
             .then(res=>{
@@ -62,7 +67,10 @@ describe('Users',()=>{
     })
 
     it('DELETE /users/:id', ()=>{
-        return request.delete(`${ENDPOINTS.USERS_BASE}/1454137`)
-            .then(res=>expect(res.body).to.be.eq(null))
+        return request.delete(`${ENDPOINTS.USERS_BASE}/${userId}`)
+            .set('Authorization',`Bearer ${process.env.TOKEN}`)
+            .then(res=>{
+                expect(res.body).to.be.empty;
+            })
     })
 })
