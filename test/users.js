@@ -13,4 +13,10 @@ describe('Users',()=>{
             done()
         })
     })
+
+    it('GET /users/:id',()=>{
+        return request.get(`/users/1440235?access-token=${TOKEN}`).then((res)=>{
+            expect(res.body.id).to.be.equal(1440235)
+        })
+    })
 })
