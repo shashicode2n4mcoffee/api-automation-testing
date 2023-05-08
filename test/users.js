@@ -59,6 +59,10 @@ describe('Users',()=>{
                 expect(res.body.name).to.be.equal(data.name);
                 expect(res.body.email).to.be.equal(data.email)
             })
+    })
 
+    it('DELETE /users/:id', ()=>{
+        return request.delete(`${ENDPOINTS.USERS_BASE}/1454137`)
+            .then(res=>expect(res.body).to.be.eq(null))
     })
 })
